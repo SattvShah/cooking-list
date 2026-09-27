@@ -293,7 +293,7 @@ function renderCatManageList() {
       catList.querySelectorAll(`.del-btn`).forEach(btn => {
       btn.addEventListener(`click`, () => {
          const amount = data.dishes.filter(r => r.cat === btn.dataset.id).length //amount of dishes under the cat
-         const ok = confirm(`Are you sure, there ${amount === 1 ? 'is' : 'are'} ${amount} dish${amount === 1 ? '' : 'es'} under this cuisine`) //confirmation to deleate the cat
+         const ok = amount === 0 ? true : confirm(`Are you sure, there ${amount === 1 ? 'is' : 'are'} ${amount} dish${amount === 1 ? '' : 'es'} under this cuisine`) //confirmation to deleate the cat
          if (ok) {
             //get rid of selected cat and all dises under that cat
             data.categories = data.categories.filter( c => c !== btn.dataset.id);
@@ -329,12 +329,14 @@ function addDish() {
    // if a duplicate is entered
    if (data.dishes.some(r => r.name === dishName && r.cat === selectedCat)){
       dishError.innerHTML = 'That dish already exists.';
+      dishError.classList.add('show');
       nameInput.focus();
 
    //if nothing is entered
    }else if (dishName === '') {
       nameInput.focus();
       dishError.innerHTML = '';
+      dishError.classList.remove('show');
 
    //if something valid is entered
    }else{
@@ -349,6 +351,7 @@ function addDish() {
       nameInput.value = '';
       nameInput.focus();
       dishError.innerHTML = '';
+      dishError.classList.remove('show');
       render();
    }
 }

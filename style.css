@@ -90,6 +90,7 @@ h2 {
     border: 1px solid var(--line);
     border-radius: 10px;
     padding: 1.25rem;
+    min-width: 0;
 }
 
 /* -----------------------------------------------------------------------
@@ -101,12 +102,17 @@ h2 {
     display: flex;
     gap: 0.5rem;
     flex-wrap: wrap;
-    margin-bottom: 1.25rem;
+    margin-bottom: 1rem;
+}
+
+.name-field-wrap {
+  flex: 1 1 180px;
+  display: flex;
+  flex-direction: column;
 }
 
 .name-field {
     position: relative;
-    flex: 1 1 180px;
     display: flex;
 }
 
@@ -142,17 +148,21 @@ h2 {
 .enter-btn:hover { opacity: 0.92; }
 
 .add-form select {
-    padding: 0.6rem 0.75rem;
+    padding: 0.5rem 0.75rem;
     border: 1px solid var(--line);
     border-radius: 7px;
     background: var(--paper-alt);
     font-family: inherit;
     font-size: 0.95rem;
     color: var(--ink);
+    align-self: flex-start;
+    height: 40px;
+    line-height: 1;
 }
 
 .edit-cats-btn {
     flex-shrink: 0;
+    align-self: flex-start;
     padding: 0.6rem 0.9rem;
     border: none;
     border-radius: 7px;
@@ -162,6 +172,8 @@ h2 {
     font-size: 0.85rem;
     font-weight: 600;
     cursor: pointer;
+    height: 40px;
+    line-height: 1;
 }
 
 .edit-cats-btn:hover { opacity: 0.92; }
@@ -172,6 +184,7 @@ h2 {
 
 .newcat-row input[type="text"] {
   flex: 1;
+  min-width: 0;
   padding: 0.55rem 0.75rem;
   border: 1px solid var(--line);
   border-radius: 7px;
@@ -227,6 +240,7 @@ h2 {
     font-size: 0.9rem;
     border-top: 1px solid var(--line);
 }
+
 
 /* -----------------------------------------------------------------------
    CUISINE FILTER TABS
@@ -459,19 +473,20 @@ color: var(--ink-soft); text-decoration: line-through;
 }
 
 #dishError {
-  position: absolute;
-  top: 100%;
-  left: 0;
   margin: 0.3rem 0 0;
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.15s ease;
+}
+
+#dishError.show {
+  max-height: 2rem;
 }
 
 #catError {
   margin: 0.4rem 0 0;
 }
 
-.add-form {
-  margin-bottom: 1.5rem; /* was 1.25rem */
-}
 
 @media (max-width: 720px) {
   #listToggle {
@@ -498,6 +513,14 @@ color: var(--ink-soft); text-decoration: line-through;
 
   #listContent.collapsed {
     display: none;
+  }
+}
+
+@media (max-width: 480px) {
+  .add-form input[type="text"],
+  .add-form select,
+  .newcat-row input[type="text"] {
+    font-size: 16px;
   }
 }
 
