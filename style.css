@@ -1,0 +1,520 @@
+/* ===========================================================================
+   Dish BOX — styles
+   Every selector you need is listed below with a comment explaining what
+   it should look like. The rule bodies are empty { } — fill them in.
+   Nothing will look right until you do; that's expected.
+   =========================================================================== */
+
+/* -----------------------------------------------------------------------
+   COLOR VARIABLES
+   Pick your own hex values here. Once set, use them everywhere below as
+   var(--name) instead of typing the hex code again — that way changing
+   a color here updates it everywhere at once.
+   ----------------------------------------------------------------------- */
+:root {
+  --paper: #F4EDE4;
+  --paper-alt: #FAF5EE;
+  --ink: #2E2621;
+  --ink-soft: #8A7B6C;
+  --brick: #C1502E;
+  --herb: #6B8E5A;
+  --line: #DDD0C0;
+  --card: #FFFCF7;
+}
+
+* { box-sizing: border-box;}
+
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: 'Inter', system-ui, system-ui, -apple-system, sans-serif;
+  line-height: 1.5;
+}
+
+/* -----------------------------------------------------------------------
+   PAGE LAYOUT
+   ----------------------------------------------------------------------- */
+
+.wrap {
+  /* the whole page's content column: give it a max-width and center it
+     with margin, plus some padding around the edges */
+    max-width: 980px;
+    margin: 0 auto;
+    padding: 2.5rem 1.25rem 4rem;
+}
+
+header {
+  margin-bottom: 2rem;
+}
+
+h1 {
+    font-family: 'Fraunces', serif;
+    font-weight: 700;
+    font-size: clamp(2rem, 5vw, 2.75rem);
+    margin: 0 0 0.35rem;
+    letter-spacing: -0.01em;
+}
+
+h2 {
+  font-family: 'Fraunces', serif;
+  font-weight: 700;
+  font-size: 1.4rem;
+  margin: 0 0 0.5rem;
+  letter-spacing: -0.01em;
+  color: var(--ink);
+}
+
+#groups h2 {
+  margin-top: 1.2rem;
+  border-bottom: 1px solid var(--line);
+  padding-bottom: 0.35rem;
+}
+
+.layout {
+    display: grid;
+    grid-template-columns: 1fr 300px;
+    gap: 1.75rem;
+    align-items: start;
+}
+
+@media (max-width: 720px) {
+  .layout {
+    grid-template-columns: 1fr; 
+  }
+}
+
+.panel {
+  /* the boxed sections — background color, border, rounded corners, padding */
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 1.25rem;
+}
+
+/* -----------------------------------------------------------------------
+   TOP ROW: add-dish input, cuisine dropdown, edit-cuisines button
+   ----------------------------------------------------------------------- */
+
+.add-form {
+  /* lay these out in a row with a gap between them, wrapping on small screens */
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    margin-bottom: 1.25rem;
+}
+
+.name-field {
+    position: relative;
+    flex: 1 1 180px;
+    display: flex;
+}
+
+.add-form input[type="text"] {
+    flex: 1 1 180px;
+    padding: 0.6rem 2.4rem 0.6rem 0.75rem;
+    border: 1px solid var(--line);
+    border-radius: 7px;
+    background: var(--paper-alt);
+    font-family: inherit;
+    font-size: 0.95rem;
+    color: var(--ink);
+    width: 100%;
+}
+
+.enter-btn {
+    position: absolute;
+    right: 5px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 30px;
+    height: 30px;
+    border: none;
+    border-radius: 6px;
+    background: var(--brick);
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    padding: 0;
+}
+.enter-btn:hover { opacity: 0.92; }
+
+.add-form select {
+    padding: 0.6rem 0.75rem;
+    border: 1px solid var(--line);
+    border-radius: 7px;
+    background: var(--paper-alt);
+    font-family: inherit;
+    font-size: 0.95rem;
+    color: var(--ink);
+}
+
+.edit-cats-btn {
+    flex-shrink: 0;
+    padding: 0.6rem 0.9rem;
+    border: none;
+    border-radius: 7px;
+    background: var(--brick);
+    color: #fff;
+    font-family: inherit;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.edit-cats-btn:hover { opacity: 0.92; }
+
+.edit-cats-btn.on {
+    background: var(--ink);
+}
+
+.newcat-row input[type="text"] {
+  flex: 1;
+  padding: 0.55rem 0.75rem;
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  background: var(--paper-alt);
+  font-family: inherit;
+  font-size: 0.9rem;
+  color: var(--ink);
+}
+
+.newcat-row button {
+  flex-shrink: 0;
+  padding: 0.55rem 1rem;
+  border: none;
+  border-radius: 7px;
+  background: var(--herb);
+  color: #fff;
+  font-family: inherit;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.newcat-row button:hover {
+  opacity: 0.9;
+}
+
+/* -----------------------------------------------------------------------
+   EDIT CUISINES PANEL
+   ----------------------------------------------------------------------- */
+
+.edit-cats-panel {
+    display: none;
+    background: var(--paper-alt);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 0.85rem;
+    margin-bottom: 1.1rem;
+}
+.edit-cats-panel.show {
+  display: block;
+}
+
+.newcat-row {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.cat-manage-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.4rem 0.1rem;
+    font-size: 0.9rem;
+    border-top: 1px solid var(--line);
+}
+
+/* -----------------------------------------------------------------------
+   CUISINE FILTER TABS
+   ----------------------------------------------------------------------- */
+
+.tabs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    margin-bottom: 1.1rem;
+}
+
+.tab {
+    padding: 0.35rem 0.85rem;
+    border-radius: 999px;
+    border: 1px solid var(--line);
+    background: var(--paper-alt);
+    color: var(--ink-soft);
+    font-size: 0.85rem;
+    font-weight: 500;
+    cursor: pointer;
+}
+.tab.active {
+    background: var(--ink);
+    border-color: var(--ink);
+    color: var(--paper-alt);
+}
+
+/* -----------------------------------------------------------------------
+   Dish LIST
+   ----------------------------------------------------------------------- */
+
+.group {
+margin-bottom: 1.4rem;
+}
+
+.group-title {
+    font-family: 'Fraunces', serif;
+    font-weight: 500;
+    font-size: 1.05rem;
+    margin: 0 0 0.5rem;
+    color: var(--ink);
+    border-bottom: 1px solid var(--line);
+    padding-bottom: 0.35rem;
+}
+
+.item {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+    padding: 0.45rem 0.15rem;
+}
+
+.item label {
+  flex: 0 1 auto;
+  font-size: 0.97rem;
+  cursor: pointer;
+}
+
+.item .del-btn {
+    margin-left: auto;
+}
+
+.item input[type="checkbox"] {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 20px;
+  height: 20px;
+  border: 2px solid var(--line);
+  border-radius: 5px;
+  background: var(--paper-alt);
+  cursor: pointer;
+  flex-shrink: 0;
+  position: relative;
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.item input[type="checkbox"]:checked {
+  background: var(--herb);
+  border-color: var(--herb);
+}
+
+.item input[type="checkbox"]:checked::after {
+  content: '';
+  position: absolute;
+  left: 5px;
+  top: 1px;
+  width: 5px;
+  height: 10px;
+  border: solid white;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+}
+
+.item input[type="checkbox"]:hover {
+  border-color: var(--herb);
+}
+
+.item.checked label {
+color: var(--ink-soft); text-decoration: line-through;
+}
+
+
+.del-btn {
+    background: none;
+    border: none;
+    color: var(--ink-soft);
+    font-size: 1.1rem;
+    line-height: 1;
+    cursor: pointer;
+    padding: 0.15rem 0.3rem;
+    opacity: 0.55;
+}
+
+.del-btn:hover { opacity: 1; color: var(--brick); }
+
+.recent-badge {
+    font-size: 0.75rem;
+    color: var(--brick);
+    margin-left: 0.4rem;
+    white-space: nowrap;
+}
+
+.empty {
+    color: var(--ink-soft);
+    font-size: 0.9rem;
+    font-style: italic;
+    padding: 0.5rem 0;
+}
+
+/* -----------------------------------------------------------------------
+   "COOKING THIS WEEK" SIDEBAR
+   ----------------------------------------------------------------------- */
+
+.week-panel {
+    position: sticky;
+    top: 1rem;
+}
+
+.week-count {
+    color: var(--ink-soft);
+    font-size: 0.85rem;
+    margin: 0 0 1rem;
+}
+
+.week-item {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    grid-template-rows: auto auto;
+    align-items: center;
+    column-gap: 0.5rem;
+    padding: 0.5rem 0.6rem;
+    background: var(--paper-alt);
+    border-radius: 7px;
+    margin-bottom: 0.45rem;
+    font-size: 0.92rem;
+}
+.week-item label {
+    grid-column: 1;
+    grid-row: 1;
+}
+.week-item .tag {
+    grid-column: 1;
+    grid-row: 2;
+    justify-self: start;
+    font-size: 0.72rem;
+    color: var(--herb);
+}
+.week-item .del-btn {
+    grid-column: 2;
+    grid-row: 1 / span 2;
+    align-self: center;
+}
+
+/* -----------------------------------------------------------------------
+   "RECENTLY COOKED" SIDEBAR
+   ----------------------------------------------------------------------- */
+
+.panel-divider {
+    border: none;
+    border-top: 1px solid var(--line);
+    margin: 1.4rem 0 1.1rem;
+}
+
+.recent-item {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    grid-template-rows: auto auto;
+    align-items: center;
+    column-gap: 0.5rem;
+    padding: 0.5rem 0.6rem;
+    background: var(--paper-alt);
+    border-radius: 7px;
+    margin-bottom: 0.45rem;
+    font-size: 0.92rem;
+}
+.recent-item label {
+    grid-column: 1;
+    grid-row: 1;
+}
+.recent-item .meta {
+    grid-column: 1;
+    grid-row: 2;
+    justify-self: start;
+}
+.recent-item .del-btn {
+    grid-column: 2;
+    grid-row: 1 / span 2;
+    align-self: center;
+}
+
+.recent-item .meta {
+    display: block;
+    margin-top: 0.1rem;
+    font-size: 0.72rem;
+    color: var(--ink-soft);
+}
+.recent-item .days {
+    color: var(--brick);
+    font-weight: 600;
+}
+
+/*------------------------------------------------------------------------*/
+
+.form-error {
+  color: var(--brick);
+  font-size: 0.78rem;
+  font-style: italic;
+  min-height: 1em;
+}
+
+#dishError {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  margin: 0.3rem 0 0;
+}
+
+#catError {
+  margin: 0.4rem 0 0;
+}
+
+.add-form {
+  margin-bottom: 1.5rem; /* was 1.25rem */
+}
+
+@media (max-width: 720px) {
+  #listToggle {
+    cursor: pointer;
+    position: relative;
+    padding-right: 1.3rem;
+  }
+
+  #listToggle::after {
+    content: '▾';
+    position: absolute;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 1rem;
+    color: var(--ink-soft);
+    transition: transform 0.15s;
+  }
+
+  #listToggle.collapsed::after {
+    transform: translateY(-50%) rotate(-90deg);
+  }
+
+  #listContent.collapsed {
+    display: none;
+  }
+}
+
+/* -----------------------------------------------------------------------
+   DARK MODE (optional — come back to this once everything else works)
+   Redefine your color variables here for when the visitor's system is
+   set to dark mode. Everything else on the page will automatically
+   follow, since it's all built on var(--ink), var(--paper), etc.
+   ----------------------------------------------------------------------- */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --paper: #211A14;
+    --paper-alt: #2A221A;
+    --ink: #F1E7DA;
+    --ink-soft: #A6957F;
+    --card: #26201A;
+    --line: #3D3327;
+    --brick: #E17A52;
+    --herb: #8FB579;
+  }
+}
