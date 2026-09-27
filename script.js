@@ -28,9 +28,9 @@ let editingCatsOpen = false;                          // is the "Edit cuisines" 
 
 //elements used outside of funtions
 const addBtn = document.getElementById(`addBtn`);     
-const nameInput = document.getElementById(`newName`);
+const nameInput = document.getElementById(`newDish`);
 const addCatBtn = document.getElementById(`saveNewCat`);     
-const catNameInput = document.getElementById(`newCatName`);
+const catNameInput = document.getElementById(`newCatInput`);
 const editCatsBtn = document.getElementById('editCatsBtn');
 const dishError = document.getElementById(`dishError`);
 const catError = document.getElementById(`catError`);
