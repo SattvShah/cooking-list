@@ -10,7 +10,7 @@ const defaultData = {
   dishes: [
     { id: 'd1', name: 'Dosa', cat: 'Indian', checked: false, cookedAt: null },
     { id: 'd2', name: 'Taco', cat: 'Mexican', checked: false, cookedAt: null },
-    { id: 'd3', name: 'Pesto Pasta', cat: 'Italian', checked: false, cookedAt: null },
+    { id: 'd3', name: 'Bataka', cat: 'Shaak', checked: false, cookedAt: null },
     { id: 'd4', name: 'Pizza', cat: 'Italian', checked: false, cookedAt: null },
   ]
 };
@@ -418,6 +418,63 @@ const listContent = document.getElementById('listContent');
 listToggle.addEventListener('click', () => {
    listContent.classList.toggle('collapsed');
    listToggle.classList.toggle('collapsed');
+});
+
+const exportBtn = document.getElementById('exportBtn');
+const importBtn = document.getElementById('importBtn');
+
+// phones, tablets, and Macs get the share menu; everything else just copies
+const useShareMenu = /iPhone|iPad|iPod|Android|Macintosh/.test(navigator.userAgent) && navigator.share;
+
+exportBtn.addEventListener('click', async () => {
+   const text = JSON.stringify(data);
+
+   if (useShareMenu) {
+      try {
+         await navigator.share({ title: 'Cooking List backup', text: text });
+      } catch (e) {
+         // user closed the share menu, nothing to do
+      }
+      return;
+   }
+
+   try {
+      await navigator.clipboard.writeText(text);
+      exportBtn.textContent = 'Copied!';
+      setTimeout(() => { exportBtn.textContent = 'Back up'; }, 1500);
+   } catch (e) {
+      restoreText.value = text;
+      restoreError.textContent = 'Select and copy the text above.';
+      restoreDialog.showModal();
+   }
+});
+
+const restoreDialog = document.getElementById('restoreDialog');
+const restoreText = document.getElementById('restoreText');
+const restoreError = document.getElementById('restoreError');
+
+importBtn.addEventListener('click', () => {
+   restoreText.value = '';
+   restoreError.textContent = '';
+   restoreDialog.showModal();
+});
+
+document.getElementById('restoreCancel').addEventListener('click', () => {
+   restoreDialog.close();
+});
+
+document.getElementById('restoreConfirm').addEventListener('click', () => {
+   try {
+      const parsed = JSON.parse(restoreText.value.trim());
+      if (!Array.isArray(parsed.categories) || !Array.isArray(parsed.dishes)) throw new Error('bad format');
+      data = parsed;
+      activeFilter = 'All';
+      selectedCat = data.categories[0] || null;
+      restoreDialog.close();
+      render();
+   } catch (e) {
+      restoreError.textContent = "That doesn't look like a valid backup.";
+   }
 });
 
 

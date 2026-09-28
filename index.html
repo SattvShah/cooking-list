@@ -75,6 +75,21 @@
     </div>
 
   </div>
+  <div class="data-row">
+    <button id="importBtn" type="button">Restore</button>
+    <button id="exportBtn" type="button">Back up</button>
+  </div>
+
+  <dialog id="restoreDialog">
+    <p>Paste your backup below. This replaces everything currently in the app.</p>
+    <textarea id="restoreText" rows="5"></textarea>
+    <p id="restoreError" class="form-error"></p>
+    <div class="dialog-btns">
+      <button id="restoreCancel" type="button">Cancel</button>
+      <button id="restoreConfirm" type="button">Restore</button>
+    </div>
+  </dialog>
+
 </div>
 
 <script src="script.js"></script>

@@ -510,6 +510,85 @@ color: var(--ink-soft); text-decoration: line-through;
   }
 }
 
+.data-row {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 1.5rem;
+}
+
+.data-row button {
+  background: none;
+  border: none;
+  padding: 0.35rem 0;
+  color: var(--ink-soft);
+  opacity: 0.7;
+  font-family: inherit;
+  font-size: 0.78rem;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+
+#restoreDialog {
+  width: min(90vw, 360px);
+  padding: 1.1rem;
+  background: var(--card);
+  color: var(--ink);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+}
+
+#restoreDialog::backdrop {
+  background: rgba(0, 0, 0, 0.45);
+}
+
+#restoreDialog p {
+  margin: 0 0 0.6rem;
+  font-size: 0.9rem;
+}
+
+#restoreText {
+  width: 100%;
+  padding: 0.6rem 0.75rem;
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  background: var(--paper-alt);
+  color: var(--ink);
+  font-family: inherit;
+  font-size: 16px;
+  resize: none;
+}
+
+.dialog-btns {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+}
+
+.dialog-btns button {
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 7px;
+  background: var(--paper-alt);
+  color: var(--ink);
+  font-family: inherit;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+#restoreConfirm {
+  background: var(--herb);
+  color: #fff;
+}
+
+@media (hover: hover) {
+  .data-row button:hover { opacity: 1; }
+}
+
+.data-row button:active { opacity: 1; }
+
 @media (max-width: 480px) {
   .add-form input[type="text"],
   .add-form select,
