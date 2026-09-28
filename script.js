@@ -6,7 +6,7 @@ dish-box
 const STORAGE_KEY = 'dish-box-data-v2';
 
 const defaultData = {
-  categories: ['Mexican', 'Italian', 'Indian'],
+  categories: ['Mexican', 'Italian', 'Indian','Shaak'],
   dishes: [
     { id: 'd1', name: 'Dosa', cat: 'Indian', checked: false, cookedAt: null },
     { id: 'd2', name: 'Taco', cat: 'Mexican', checked: false, cookedAt: null },
