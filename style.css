@@ -1,17 +1,71 @@
 /* ===========================================================================
-   Dish BOX — styles
-   Every selector you need is listed below with a comment explaining what
-   it should look like. The rule bodies are empty { } — fill them in.
-   Nothing will look right until you do; that's expected.
+   DISH BOX — styles
+
+   CONTENTS
+     1.  Color variables (+ dark mode and picker themes)
+     2.  Base styles (reset, body, headings)
+     3.  Page layout (wrapper, header, columns, panels)
+     4.  Shared pieces (× button, empty text, form errors)
+     5.  Add-dish form
+     6.  Edit buttons + cuisine editor panel
+     7.  Cuisine filter tabs
+     8.  Dish list
+     9.  Sidebar (cooking this week / recently cooked)
+    10.  Bottom button row (Recently deleted, Change theme, Back up, Restore)
+    11.  Dialogs (restore, recently deleted, theme picker, edit dish)
+    12.  Recipe page
+    13.  Undo toast
+    14.  Phone / small-screen overrides
+    15.  Hover + tap feedback
+
+   Note: sections 14 and 15 sit at the bottom on purpose. They override the
+   rules above, so they need to come last.
    =========================================================================== */
 
-/* -----------------------------------------------------------------------
-   COLOR VARIABLES
-   Pick your own hex values here. Once set, use them everywhere below as
-   var(--name) instead of typing the hex code again — that way changing
-   a color here updates it everywhere at once.
-   ----------------------------------------------------------------------- */
+
+/* ===========================================================================
+   1. COLOR VARIABLES
+   Use var(--name) everywhere instead of typing hex codes, so changing a color
+   here changes it across the whole app.
+   =========================================================================== */
 :root {
+  --paper: #F4EDE4;      /* page background */
+  --paper-alt: #FAF5EE;  /* inputs, buttons, inset boxes */
+  --ink: #2E2621;        /* main text */
+  --ink-soft: #8A7B6C;   /* muted text */
+  --brick: #C1502E;      /* main accent (red-orange) */
+  --herb: #6B8E5A;       /* secondary accent (green) */
+  --line: #DDD0C0;       /* borders and dividers */
+  --card: #FFFCF7;       /* panel background */
+  --danger: #D63A2F;     /* destructive hover */
+}
+
+/* Dark mode: same variables, new values. Everything else follows automatically. */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --paper: #211A14;
+    --paper-alt: #2A221A;
+    --ink: #F1E7DA;
+    --ink-soft: #A6957F;
+    --card: #26201A;
+    --line: #3D3327;
+    --brick: #E17A52;
+    --herb: #8FB579;
+    --danger: #F0644F;
+  }
+}
+
+/* --- Picker themes ---
+   "Change theme" (bottom of the page) sets data-theme on <html> and script.js
+   remembers the choice. Each theme redefines every variable, so it wins over
+   both the default and the dark-mode rule above. With no data-theme set, the
+   app follows the device's light/dark setting like before.
+   color-scheme makes the dropdown menu and scrollbars match the theme too.
+   "classic" and "classic-dark" repeat the default and dark-mode values above,
+   so if you change those, change them here as well. */
+
+:root[data-theme="classic"] {
+  color-scheme: light;
   --paper: #F4EDE4;
   --paper-alt: #FAF5EE;
   --ink: #2E2621;
@@ -20,9 +74,80 @@
   --herb: #6B8E5A;
   --line: #DDD0C0;
   --card: #FFFCF7;
+  --danger: #D63A2F;
 }
 
-* { box-sizing: border-box;}
+:root[data-theme="classic-dark"] {
+  color-scheme: dark;
+  --paper: #211A14;
+  --paper-alt: #2A221A;
+  --ink: #F1E7DA;
+  --ink-soft: #A6957F;
+  --card: #26201A;
+  --line: #3D3327;
+  --brick: #E17A52;
+  --herb: #8FB579;
+  --danger: #F0644F;
+}
+
+:root[data-theme="ocean"] {
+  color-scheme: light;
+  --paper: #EAF1F5;
+  --paper-alt: #F3F8FB;
+  --ink: #1E2B34;
+  --ink-soft: #66808F;
+  --brick: #2B7BA8;
+  --herb: #3C9686;
+  --line: #CBDBE4;
+  --card: #FBFDFE;
+  --danger: #D63A2F;
+}
+
+:root[data-theme="ocean-dark"] {
+  color-scheme: dark;
+  --paper: #121C22;
+  --paper-alt: #18252D;
+  --ink: #E3EEF4;
+  --ink-soft: #8FA8B6;
+  --brick: #3F97C4;
+  --herb: #3FA596;
+  --line: #2B3D48;
+  --card: #16222A;
+  --danger: #F0644F;
+}
+
+:root[data-theme="plum"] {
+  color-scheme: light;
+  --paper: #F3ECF2;
+  --paper-alt: #FAF5FA;
+  --ink: #2B2230;
+  --ink-soft: #7E6F86;
+  --brick: #A63F7C;
+  --herb: #7263B0;
+  --line: #DDCEDC;
+  --card: #FFFBFE;
+  --danger: #D63A2F;
+}
+
+:root[data-theme="plum-dark"] {
+  color-scheme: dark;
+  --paper: #1D1620;
+  --paper-alt: #261D2A;
+  --ink: #F0E4F0;
+  --ink-soft: #A793AD;
+  --brick: #C25A93;
+  --herb: #9C8CD6;
+  --line: #3A2C40;
+  --card: #221A26;
+  --danger: #F0644F;
+}
+
+
+/* ===========================================================================
+   2. BASE STYLES
+   =========================================================================== */
+
+* { box-sizing: border-box; }
 
 body {
   margin: 0;
@@ -32,28 +157,15 @@ body {
   line-height: 1.5;
 }
 
-/* -----------------------------------------------------------------------
-   PAGE LAYOUT
-   ----------------------------------------------------------------------- */
-
-.wrap {
-  /* the whole page's content column: give it a max-width and center it
-     with margin, plus some padding around the edges */
-    max-width: 980px;
-    margin: 0 auto;
-    padding: 2.5rem 1.25rem 4rem;
-}
-
-header {
-  margin-bottom: 2rem;
-}
+/* Anything with the HTML "hidden" attribute stays hidden (list/recipe swap, toast) */
+[hidden] { display: none !important; }
 
 h1 {
-    font-family: 'Fraunces', serif;
-    font-weight: 700;
-    font-size: clamp(2rem, 5vw, 2.75rem);
-    margin: 0 0 0.35rem;
-    letter-spacing: -0.01em;
+  font-family: 'Fraunces', serif;
+  font-weight: 700;
+  font-size: clamp(2rem, 5vw, 2.75rem);
+  margin: 0 0 0.35rem;
+  letter-spacing: -0.01em;
 }
 
 h2 {
@@ -65,119 +177,206 @@ h2 {
   color: var(--ink);
 }
 
-#groups h2 {
-  margin-top: 1.2rem;
-  border-bottom: 1px solid var(--line);
-  padding-bottom: 0.35rem;
+
+/* ===========================================================================
+   3. PAGE LAYOUT
+   =========================================================================== */
+
+/* The page's content column: max width, centered, padded */
+.wrap {
+  max-width: 980px;
+  margin: 0 auto;
+  padding: 2.5rem 1.25rem 4rem;
 }
 
+header {
+  margin-bottom: 2rem;
+}
+
+/* Two columns: dish list on the left, weekly sidebar on the right
+   (stacks into one column on phones, see section 14) */
 .layout {
-    display: grid;
-    grid-template-columns: 1fr 300px;
-    gap: 1.75rem;
-    align-items: start;
+  display: grid;
+  grid-template-columns: 1fr 300px;
+  gap: 1.75rem;
+  align-items: start;
 }
 
-@media (max-width: 720px) {
-  .layout {
-    grid-template-columns: 1fr; 
-  }
-}
-
+/* The boxed sections: background, border, rounded corners, padding */
 .panel {
-  /* the boxed sections — background color, border, rounded corners, padding */
-    background: var(--card);
-    border: 1px solid var(--line);
-    border-radius: 10px;
-    padding: 1.25rem;
-    min-width: 0;
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 1.25rem;
+  min-width: 0;
 }
 
-/* -----------------------------------------------------------------------
-   TOP ROW: add-dish input, cuisine dropdown, edit-cuisines button
-   ----------------------------------------------------------------------- */
 
+/* ===========================================================================
+   4. SHARED PIECES
+   Used in several places, so they live here instead of with one feature.
+   =========================================================================== */
+
+/* Small × button (sidebar lists, cuisine editor) */
+.del-btn {
+  background: none;
+  border: none;
+  color: var(--ink-soft);
+  font-size: 1.1rem;
+  line-height: 1;
+  cursor: pointer;
+  padding: 0.15rem 0.3rem;
+  opacity: 0.55;
+}
+
+/* "no dishes yet" / "Nothing deleted recently." messages */
+.empty {
+  color: var(--ink-soft);
+  font-size: 0.9rem;
+  font-style: italic;
+  padding: 0.5rem 0;
+}
+
+/* Small red validation message under an input */
+.form-error {
+  color: var(--brick);
+  font-size: 0.78rem;
+  font-style: italic;
+  min-height: 1em;
+}
+
+
+/* ===========================================================================
+   5. ADD-DISH FORM
+   Top row: dish name input (with enter button inside it) + cuisine dropdown
+   =========================================================================== */
+
+/* Row layout: wraps onto a new line on small screens */
 .add-form {
-  /* lay these out in a row with a gap between them, wrapping on small screens */
-    display: flex;
-    gap: 0.5rem;
-    flex-wrap: wrap;
-    margin-bottom: 1rem;
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin-bottom: 0.6rem;
 }
 
+/* Input + its error message stacked vertically */
 .name-field-wrap {
   flex: 1 1 180px;
   display: flex;
   flex-direction: column;
 }
 
+/* Wrapper so the enter button can sit inside the input's right edge */
 .name-field {
-    position: relative;
-    display: flex;
+  position: relative;
+  display: flex;
 }
 
 .add-form input[type="text"] {
-    flex: 1 1 180px;
-    padding: 0.6rem 2.4rem 0.6rem 0.75rem;
-    border: 1px solid var(--line);
-    border-radius: 7px;
-    background: var(--paper-alt);
-    font-family: inherit;
-    font-size: 0.95rem;
-    color: var(--ink);
-    width: 100%;
+  flex: 1 1 180px;
+  padding: 0.6rem 2.4rem 0.6rem 0.75rem;
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  background: var(--paper-alt);
+  font-family: inherit;
+  font-size: 0.95rem;
+  color: var(--ink);
+  width: 100%;
 }
 
+/* The round-arrow button inside the input */
 .enter-btn {
-    position: absolute;
-    right: 5px;
-    top: 50%;
-    transform: translateY(-50%);
-    width: 30px;
-    height: 30px;
-    border: none;
-    border-radius: 6px;
-    background: var(--brick);
-    color: #fff;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    padding: 0;
+  position: absolute;
+  right: 5px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 30px;
+  height: 30px;
+  border: none;
+  border-radius: 6px;
+  background: var(--brick);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  padding: 0;
 }
 
 .add-form select {
-    padding: 0.5rem 0.75rem;
-    border: 1px solid var(--line);
-    border-radius: 7px;
-    background: var(--paper-alt);
-    font-family: inherit;
-    font-size: 0.95rem;
-    color: var(--ink);
-    align-self: flex-start;
-    height: 40px;
-    line-height: 1;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  background: var(--paper-alt);
+  font-family: inherit;
+  font-size: 0.95rem;
+  color: var(--ink);
+  align-self: flex-start;
+  height: 40px;
+  line-height: 1;
 }
 
-.edit-cats-btn {
-    flex-shrink: 0;
-    align-self: flex-start;
-    padding: 0.6rem 0.9rem;
-    border: none;
-    border-radius: 7px;
-    background: var(--brick);
-    color: #fff;
-    font-family: inherit;
-    font-size: 0.85rem;
-    font-weight: 600;
-    cursor: pointer;
-    height: 40px;
-    line-height: 1;
+/* "That dish already exists." message. Collapsed until JS adds .show */
+#dishError {
+  margin: 0.3rem 0 0;
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.15s ease;
+}
+
+#dishError.show {
+  max-height: 2rem;
 }
 
 
-.edit-cats-btn.on {
-    background: var(--ink);
+/* ===========================================================================
+   6. EDIT BUTTONS + CUISINE EDITOR PANEL
+   =========================================================================== */
+
+/* The "Edit cuisines" / "Edit dishes" pill buttons */
+.edit-row {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1.1rem;
+}
+
+.edit-row button {
+  padding: 0.35rem 0.85rem;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  background: var(--paper-alt);
+  color: var(--ink-soft);
+  font-family: inherit;
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+/* Highlighted while that edit mode is on (button reads "Done") */
+.edit-row button.on {
+  background: var(--brick);
+  border-color: var(--brick);
+  color: #fff;
+}
+
+/* The panel that opens under the buttons. Hidden until JS adds .show */
+.edit-cats-panel {
+  display: none;
+  background: var(--paper-alt);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 0.85rem;
+  margin-bottom: 1.1rem;
+}
+
+.edit-cats-panel.show {
+  display: block;
+}
+
+/* "Add a Cuisine" input + Add button */
+.newcat-row {
+  display: flex;
+  gap: 0.5rem;
 }
 
 .newcat-row input[type="text"] {
@@ -205,89 +404,70 @@ h2 {
   cursor: pointer;
 }
 
-
-
-/* -----------------------------------------------------------------------
-   EDIT CUISINES PANEL
-   ----------------------------------------------------------------------- */
-
-.edit-cats-panel {
-    display: none;
-    background: var(--paper-alt);
-    border: 1px solid var(--line);
-    border-radius: 8px;
-    padding: 0.85rem;
-    margin-bottom: 1.1rem;
-}
-.edit-cats-panel.show {
-  display: block;
+/* "That cuisine already exists." message */
+#catError {
+  margin: 0.4rem 0 0;
 }
 
-.newcat-row {
-  display: flex;
-  gap: 0.5rem;
-}
-
+/* One row in the list of cuisines (name on the left, × on the right) */
 .cat-manage-item {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 0.4rem 0.1rem;
-    font-size: 0.9rem;
-    border-top: 1px solid var(--line);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.4rem 0.1rem;
+  font-size: 0.9rem;
+  border-top: 1px solid var(--line);
 }
 
 
-/* -----------------------------------------------------------------------
-   CUISINE FILTER TABS
-   ----------------------------------------------------------------------- */
+/* ===========================================================================
+   7. CUISINE FILTER TABS  (All / Mexican / Italian ...)
+   =========================================================================== */
 
 .tabs {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.4rem;
-    margin-bottom: 1.1rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-bottom: 1.1rem;
 }
 
 .tab {
-    padding: 0.35rem 0.85rem;
-    border-radius: 999px;
-    border: 1px solid var(--line);
-    background: var(--paper-alt);
-    color: var(--ink-soft);
-    font-size: 0.85rem;
-    font-weight: 500;
-    cursor: pointer;
+  padding: 0.35rem 0.85rem;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  background: var(--paper-alt);
+  color: var(--ink-soft);
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
 }
+
 .tab.active {
-    background: var(--ink);
-    border-color: var(--ink);
-    color: var(--paper-alt);
+  background: var(--ink);
+  border-color: var(--ink);
+  color: var(--paper-alt);
 }
 
-/* -----------------------------------------------------------------------
-   Dish LIST
-   ----------------------------------------------------------------------- */
 
-.group {
-margin-bottom: 1.4rem;
+/* ===========================================================================
+   8. DISH LIST
+   Cuisine heading, then one row per dish: checkbox, name, "cooked" badge,
+   and a recipe button (or × button while editing dishes)
+   =========================================================================== */
+
+/* Cuisine headings in the list */
+#groups h2 {
+  margin-top: 1.2rem;
+  border-bottom: 1px solid var(--line);
+  padding-bottom: 0.35rem;
 }
 
-.group-title {
-    font-family: 'Fraunces', serif;
-    font-weight: 500;
-    font-size: 1.05rem;
-    margin: 0 0 0.5rem;
-    color: var(--ink);
-    border-bottom: 1px solid var(--line);
-    padding-bottom: 0.35rem;
-}
-
+/* One dish row */
 .item {
-    display: flex;
-    align-items: center;
-    gap: 0.65rem;
-    padding: 0.45rem 0.15rem;
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  padding: 0.45rem 0.15rem;
 }
 
 .item label {
@@ -296,10 +476,19 @@ margin-bottom: 1.4rem;
   cursor: pointer;
 }
 
-.item .del-btn {
-    margin-left: auto;
+/* Recipe / delete button is pushed to the far right of the row */
+.item .item-btn {
+  margin-left: auto;
 }
 
+/* Checked dish: greyed out with a line through the name */
+.item.checked label,
+.item.checked .dish-name-btn {
+  color: var(--ink-soft);
+  text-decoration: line-through;
+}
+
+/* Custom checkbox: hides the browser default and draws our own */
 .item input[type="checkbox"] {
   appearance: none;
   -webkit-appearance: none;
@@ -319,6 +508,7 @@ margin-bottom: 1.4rem;
   border-color: var(--herb);
 }
 
+/* The white checkmark */
 .item input[type="checkbox"]:checked::after {
   content: '';
   position: absolute;
@@ -331,158 +521,595 @@ margin-bottom: 1.4rem;
   transform: rotate(45deg);
 }
 
-
-
-.item.checked label {
-color: var(--ink-soft); text-decoration: line-through;
-}
-
-
-.del-btn {
-    background: none;
-    border: none;
-    color: var(--ink-soft);
-    font-size: 1.1rem;
-    line-height: 1;
-    cursor: pointer;
-    padding: 0.15rem 0.3rem;
-    opacity: 0.55;
-}
-
-
-
+/* Small "today" / "yesterday" / date badge next to the name */
 .recent-badge {
-    font-size: 0.75rem;
-    color: var(--brick);
-    margin-left: 0.4rem;
-    white-space: nowrap;
-}
-
-.empty {
-    color: var(--ink-soft);
-    font-size: 0.9rem;
-    font-style: italic;
-    padding: 0.5rem 0;
-}
-
-/* -----------------------------------------------------------------------
-   "COOKING THIS WEEK" SIDEBAR
-   ----------------------------------------------------------------------- */
-
-.week-panel {
-    position: sticky;
-    top: 1rem;
-}
-
-.week-count {
-    color: var(--ink-soft);
-    font-size: 0.85rem;
-    margin: 0 0 1rem;
-}
-
-.week-item {
-    display: grid;
-    grid-template-columns: 1fr auto;
-    grid-template-rows: auto auto;
-    align-items: center;
-    column-gap: 0.5rem;
-    padding: 0.5rem 0.6rem;
-    background: var(--paper-alt);
-    border-radius: 7px;
-    margin-bottom: 0.45rem;
-    font-size: 0.92rem;
-}
-.week-item label {
-    grid-column: 1;
-    grid-row: 1;
-}
-.week-item .tag {
-    grid-column: 1;
-    grid-row: 2;
-    justify-self: start;
-    font-size: 0.72rem;
-    color: var(--herb);
-}
-.week-item .del-btn {
-    grid-column: 2;
-    grid-row: 1 / span 2;
-    align-self: center;
-}
-
-/* -----------------------------------------------------------------------
-   "RECENTLY COOKED" SIDEBAR
-   ----------------------------------------------------------------------- */
-
-.panel-divider {
-    border: none;
-    border-top: 1px solid var(--line);
-    margin: 1.4rem 0 1.1rem;
-}
-
-.recent-item {
-    display: grid;
-    grid-template-columns: 1fr auto;
-    grid-template-rows: auto auto;
-    align-items: center;
-    column-gap: 0.5rem;
-    padding: 0.5rem 0.6rem;
-    background: var(--paper-alt);
-    border-radius: 7px;
-    margin-bottom: 0.45rem;
-    font-size: 0.92rem;
-}
-.recent-item label {
-    grid-column: 1;
-    grid-row: 1;
-}
-.recent-item .meta {
-    grid-column: 1;
-    grid-row: 2;
-    justify-self: start;
-}
-.recent-item .del-btn {
-    grid-column: 2;
-    grid-row: 1 / span 2;
-    align-self: center;
-}
-
-.recent-item .meta {
-    display: block;
-    margin-top: 0.1rem;
-    font-size: 0.72rem;
-    color: var(--ink-soft);
-}
-.recent-item .days {
-    color: var(--brick);
-    font-weight: 600;
-}
-
-/*------------------------------------------------------------------------*/
-
-.form-error {
+  font-size: 0.75rem;
   color: var(--brick);
+  margin-left: 0.4rem;
+  white-space: nowrap;
+}
+
+/* Recipe button (normal mode) and pencil + × buttons (Edit dishes mode) share a size */
+.recipe-btn,
+.dish-edit-btn,
+.dish-del-btn {
+  width: 30px;
+  height: 30px;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  cursor: pointer;
+}
+
+.recipe-btn {
+  border: none;
+  border-radius: 6px;
+  color: var(--ink-soft);
+  opacity: 0.7;
+}
+
+/* Turns green once the dish has a recipe saved */
+.recipe-btn.has-recipe {
+  color: var(--herb);
+  opacity: 1;
+}
+
+.dish-del-btn {
+  border: none;
+  border-radius: 6px;
+  color: var(--brick);
+  font-size: 1.1rem;
+  line-height: 1;
+}
+
+/* Edit dishes mode: the pencil takes the checkbox's place... */
+.dish-edit-btn {
+  border: none;
+  border-radius: 6px;
+  color: var(--ink-soft);
+}
+
+/* ...and the dish name becomes plain text you can tap to edit */
+.dish-name-btn {
+  flex: 0 1 auto;
+  padding: 0;
+  border: none;
+  background: none;
+  color: inherit;
+  font: inherit;
+  font-size: 0.97rem;
+  text-align: left;
+  cursor: pointer;
+}
+
+/* NOT currently used: script.js draws cuisine headings as <h2> (see
+   "#groups h2" above), so these two rules don't match anything right now.
+   Kept in case you want them later. */
+.group {
+  margin-bottom: 1.4rem;
+}
+
+.group-title {
+  font-family: 'Fraunces', serif;
+  font-weight: 500;
+  font-size: 1.05rem;
+  margin: 0 0 0.5rem;
+  color: var(--ink);
+  border-bottom: 1px solid var(--line);
+  padding-bottom: 0.35rem;
+}
+
+
+/* ===========================================================================
+   9. SIDEBAR — "Cooking this week" + "Recently cooked"
+   =========================================================================== */
+
+/* Sidebar stays on screen while the list scrolls */
+.week-panel {
+  position: sticky;
+  top: 1rem;
+}
+
+/* "3 dishes planned" / "Nothing here yet" line under each sidebar heading */
+.week-count {
+  color: var(--ink-soft);
+  font-size: 0.85rem;
+  margin: 0 0 1rem;
+}
+
+/* Line between "Cooking this week" and "Recently cooked" */
+.panel-divider {
+  border: none;
+  border-top: 1px solid var(--line);
+  margin: 1.4rem 0 1.1rem;
+}
+
+/* --- Rows shared by both sidebar lists ---
+   Grid: name on the first line, small text on the second line, and the
+   × button spanning both lines on the right. */
+.week-item,
+.recent-item {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  grid-template-rows: auto auto;
+  align-items: center;
+  column-gap: 0.5rem;
+  padding: 0.5rem 0.6rem;
+  background: var(--paper-alt);
+  border-radius: 7px;
+  margin-bottom: 0.45rem;
+  font-size: 0.92rem;
+}
+
+.week-item label,
+.recent-item label {
+  grid-column: 1;
+  grid-row: 1;
+}
+
+/* .tag = cuisine name (week list), .meta = cuisine + date (recent list) */
+.week-item .tag,
+.recent-item .meta {
+  grid-column: 1;
+  grid-row: 2;
+  justify-self: start;
+}
+
+.week-item .del-btn,
+.recent-item .del-btn {
+  grid-column: 2;
+  grid-row: 1 / span 2;
+  align-self: center;
+}
+
+/* --- "Cooking this week" only --- */
+.week-item .tag {
+  font-size: 0.72rem;
+  color: var(--herb);
+}
+
+/* --- "Recently cooked" only --- */
+.recent-item .meta {
+  display: block;
+  margin-top: 0.1rem;
+  font-size: 0.72rem;
+  color: var(--ink-soft);
+}
+
+.recent-item .days {
+  color: var(--brick);
+  font-weight: 600;
+}
+
+
+/* ===========================================================================
+   10. BOTTOM BUTTON ROW  (Recently deleted, Change theme, Back up, Restore)
+   Small underlined text buttons at the bottom of the page
+   =========================================================================== */
+
+.data-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem 1rem;
+  margin-top: 1.5rem;
+}
+
+/* The auto margin pushes Back up (and Restore after it) to the right side,
+   leaving Recently deleted + Change theme grouped on the left */
+#exportBtn {
+  margin-left: auto;
+}
+
+.data-row button {
+  background: none;
+  border: none;
+  padding: 0.35rem 0;
+  color: var(--ink-soft);
+  opacity: 0.7;
+  font-family: inherit;
   font-size: 0.78rem;
-  font-style: italic;
-  min-height: 1em;
-}
-
-#dishError {
-  margin: 0.3rem 0 0;
-  max-height: 0;
-  overflow: hidden;
-  transition: max-height 0.15s ease;
-}
-
-#dishError.show {
-  max-height: 2rem;
-}
-
-#catError {
-  margin: 0.4rem 0 0;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
 }
 
 
+/* ===========================================================================
+   11. DIALOGS  (Restore backup + Recently deleted)
+   =========================================================================== */
+
+/* --- Look shared by both dialogs --- */
+#restoreDialog,
+#trashDialog,
+#themeDialog,
+#editDishDialog {
+  width: min(90vw, 360px);
+  padding: 1.1rem;
+  background: var(--card);
+  color: var(--ink);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+}
+
+#restoreDialog::backdrop,
+#trashDialog::backdrop,
+#themeDialog::backdrop,
+#editDishDialog::backdrop {
+  background: rgba(0, 0, 0, 0.45);
+}
+
+#restoreDialog p,
+#trashDialog p,
+#themeDialog p,
+#editDishDialog p {
+  margin: 0 0 0.6rem;
+  font-size: 0.9rem;
+}
+
+/* Cancel / Close / Restore buttons along the bottom of a dialog */
+.dialog-btns {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+}
+
+.dialog-btns button {
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 7px;
+  background: var(--paper-alt);
+  color: var(--ink);
+  font-family: inherit;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+/* --- Restore dialog --- */
+#restoreText {
+  width: 100%;
+  padding: 0.6rem 0.75rem;
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  background: var(--paper-alt);
+  color: var(--ink);
+  font-family: inherit;
+  font-size: 16px;
+  resize: none;
+}
+
+#restoreConfirm {
+  background: var(--herb);
+  color: #fff;
+}
+
+/* --- Recently deleted dialog --- */
+#trashList {
+  max-height: 50vh;
+  overflow-y: auto;
+}
+
+.trash-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.55rem 0;
+  border-top: 1px solid var(--line);
+}
+
+.trash-item:first-child { border-top: none; }
+
+.trash-name { font-size: 0.95rem; }
+
+.trash-meta {
+  font-size: 0.75rem;
+  color: var(--ink-soft);
+}
+
+/* Put-back and delete-forever icon buttons */
+.trash-actions {
+  display: flex;
+  gap: 0.25rem;
+  flex-shrink: 0;
+}
+
+.trash-actions button {
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: none;
+  border-radius: 7px;
+  background: none;
+  cursor: pointer;
+}
+
+.trash-restore { color: var(--herb); }
+.trash-delete { color: var(--ink-soft); }
+
+/* --- Theme dialog --- */
+
+/* Grid of round swatches, each with its name underneath */
+.theme-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(72px, 1fr));
+  gap: 1rem 0.5rem;
+  padding: 0.5rem 0;
+}
+
+.theme-opt {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.25rem 0;
+  border: none;
+  background: none;
+  color: var(--ink);
+  font-family: inherit;
+  font-size: 0.78rem;
+  cursor: pointer;
+}
+
+/* The circle: half the theme's background color, half its main color */
+.theme-swatch {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 1px solid var(--line);
+  background: linear-gradient(135deg, var(--sw-a) 50%, var(--sw-b) 50%);
+}
+
+/* The selected theme gets a ring around its circle */
+.theme-opt.selected .theme-swatch {
+  box-shadow: 0 0 0 3px var(--card), 0 0 0 5px var(--brick);
+}
+
+.theme-opt.selected .theme-name {
+  font-weight: 600;
+}
+
+/* --- Edit dish dialog --- */
+
+.dialog-title {
+  font-weight: 600;
+}
+
+.dialog-label {
+  display: block;
+  margin: 0.6rem 0 0.25rem;
+  font-size: 0.78rem;
+  color: var(--ink-soft);
+}
+
+/* 16px text stops iPhones from zooming in when you tap the fields */
+#editDishName,
+#editDishCat {
+  display: block;
+  width: 100%;
+  padding: 0.6rem 0.75rem;
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  background: var(--paper-alt);
+  color: var(--ink);
+  font-family: inherit;
+  font-size: 16px;
+}
+
+#editDishCat {
+  margin-bottom: 0.4rem;
+}
+
+
+/* ===========================================================================
+   12. RECIPE PAGE  (full screen, swaps with the list)
+   =========================================================================== */
+
+#recipeView {
+  max-width: 700px;
+  margin: 0 auto;
+}
+
+/* --- Top bar: back arrow + Edit button --- */
+.recipe-bar {
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: 56px;
+  background: var(--paper);
+}
+
+#recipeBack {
+  width: 40px;
+  height: 40px;
+  margin-left: -8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: none;
+  color: var(--ink);
+  cursor: pointer;
+}
+
+#recipeEdit {
+  padding: 0.35rem 1rem;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  background: var(--paper-alt);
+  color: var(--ink-soft);
+  font-family: inherit;
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+/* Highlighted while editing (button reads "Done") */
+#recipeView.editing #recipeEdit {
+  background: var(--brick);
+  border-color: var(--brick);
+  color: #fff;
+}
+
+/* --- Formatting toolbar (bullets, numbers, bold, heading) ---
+   Only visible in edit mode. Sits under the top bar on desktop; on phones
+   it moves to the bottom above the keyboard (see section 14). */
+.recipe-toolbar {
+  display: none;
+  position: sticky;
+  top: 56px;
+  z-index: 4;
+  gap: 0.4rem;
+  padding: 0.4rem 0 0.6rem;
+  background: var(--paper);
+}
+
+#recipeView.editing .recipe-toolbar { display: flex; }
+
+.recipe-toolbar button {
+  min-width: 44px;
+  height: 36px;
+  padding: 0 0.7rem;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--paper-alt);
+  color: var(--ink);
+  font-family: inherit;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+/* Lit up when the caret is in bold text / a list / a heading */
+.recipe-toolbar button.on {
+  background: var(--ink);
+  border-color: var(--ink);
+  color: var(--paper-alt);
+}
+
+/* --- The "paper" the recipe is written on --- */
+.recipe-sheet {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 1.5rem;
+  min-height: 60vh;
+}
+
+#recipeTitle { margin-bottom: 0.25rem; }
+
+/* Cuisine name under the title */
+.recipe-tag {
+  display: inline-block;
+  margin-bottom: 1.2rem;
+  font-size: 0.8rem;
+  color: var(--herb);
+}
+
+/* --- The editable text area --- */
+#recipeEditor {
+  position: relative;
+  min-height: 50vh;
+  outline: none;
+  font-size: 16px;
+  line-height: 1.6;
+  white-space: pre-wrap; /* keeps tab characters */
+  tab-size: 4;
+}
+
+#recipeView:not(.editing) #recipeEditor { min-height: 1.6em; }
+
+/* Placeholder text ("No recipe yet." / "Ingredients, steps, notes...") */
+#recipeEditor.is-empty::before {
+  content: attr(data-placeholder);
+  position: absolute;
+  color: var(--ink-soft);
+  pointer-events: none;
+}
+
+/* Formatting that can appear inside a recipe */
+#recipeEditor p { margin: 0; }
+
+#recipeEditor h3 {
+  font-family: 'Fraunces', serif;
+  font-weight: 500; /* not bold, so the Bold button only lights up for real bold text */
+  font-size: 1.2rem;
+  margin: 1.2rem 0 0.4rem;
+  padding-bottom: 0.25rem;
+  border-bottom: 1px solid var(--line);
+}
+
+#recipeEditor ul,
+#recipeEditor ol { margin: 0.3rem 0; padding-left: 1.4rem; }
+
+#recipeEditor li { margin: 0.15rem 0; }
+
+#recipeEditor ul ul,
+#recipeEditor ol ol,
+#recipeEditor li ul,
+#recipeEditor li ol { margin: 0; }
+
+
+/* ===========================================================================
+   13. UNDO TOAST  ("Deleted ... Undo" bar at the bottom of the screen)
+   =========================================================================== */
+
+.toast {
+  position: fixed;
+  left: 50%;
+  bottom: calc(1.25rem + env(safe-area-inset-bottom, 0px));
+  transform: translateX(-50%);
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  max-width: calc(100vw - 2rem);
+  padding: 0.65rem 0.9rem 0.65rem 1.1rem;
+  background: var(--ink);
+  color: var(--paper-alt);
+  border-radius: 10px;
+  font-size: 0.9rem;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
+}
+
+.toast button {
+  padding: 0.2rem 0.3rem;
+  border: none;
+  background: none;
+  color: inherit;
+  font-family: inherit;
+  font-size: 0.9rem;
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+
+
+/* ===========================================================================
+   14. PHONE / SMALL-SCREEN OVERRIDES
+   Kept last so they win over the normal rules above.
+   =========================================================================== */
+
+/* --- Tablets and phones (720px and narrower) --- */
 @media (max-width: 720px) {
+
+  /* Sidebar drops below the list */
+  .layout {
+    grid-template-columns: 1fr;
+  }
+
+  /* Tapping the "Cooking List" title collapses/expands the list; the ▾ arrow
+     shows which state it is in */
   #listToggle {
     cursor: pointer;
     position: relative;
@@ -508,88 +1135,41 @@ color: var(--ink-soft); text-decoration: line-through;
   #listContent.collapsed {
     display: none;
   }
+
+  /* Recipe page: the page is just the text, no paper box */
+  .recipe-sheet {
+    border: none;
+    background: none;
+    padding: 0;
+    min-height: 0;
+  }
+
+  /* Recipe toolbar sits above the keyboard (--kb is set by script.js) */
+  .recipe-toolbar {
+    position: fixed;
+    top: auto;
+    left: 0;
+    right: 0;
+    bottom: var(--kb, 0px);
+    padding: 0.5rem 0.75rem;
+    border-top: 1px solid var(--line);
+    background: var(--card);
+  }
+
+  /* Extra space at the bottom so the toolbar doesn't cover the text */
+  #recipeView.editing { padding-bottom: 4rem; }
 }
 
-.data-row {
-  display: flex;
-  justify-content: space-between;
-  margin-top: 1.5rem;
-}
-
-.data-row button {
-  background: none;
-  border: none;
-  padding: 0.35rem 0;
-  color: var(--ink-soft);
-  opacity: 0.7;
-  font-family: inherit;
-  font-size: 0.78rem;
-  text-decoration: underline;
-  text-underline-offset: 3px;
-  cursor: pointer;
-}
-
-#restoreDialog {
-  width: min(90vw, 360px);
-  padding: 1.1rem;
-  background: var(--card);
-  color: var(--ink);
-  border: 1px solid var(--line);
-  border-radius: 10px;
-}
-
-#restoreDialog::backdrop {
-  background: rgba(0, 0, 0, 0.45);
-}
-
-#restoreDialog p {
-  margin: 0 0 0.6rem;
-  font-size: 0.9rem;
-}
-
-#restoreText {
-  width: 100%;
-  padding: 0.6rem 0.75rem;
-  border: 1px solid var(--line);
-  border-radius: 7px;
-  background: var(--paper-alt);
-  color: var(--ink);
-  font-family: inherit;
-  font-size: 16px;
-  resize: none;
-}
-
-.dialog-btns {
-  display: flex;
-  justify-content: flex-end;
-  gap: 0.5rem;
-  margin-top: 0.75rem;
-}
-
-.dialog-btns button {
-  padding: 0.5rem 1rem;
-  border: none;
-  border-radius: 7px;
-  background: var(--paper-alt);
-  color: var(--ink);
-  font-family: inherit;
-  font-size: 0.85rem;
-  font-weight: 600;
-  cursor: pointer;
-}
-
-#restoreConfirm {
-  background: var(--herb);
-  color: #fff;
-}
-
-@media (hover: hover) {
-  .data-row button:hover { opacity: 1; }
-}
-
-.data-row button:active { opacity: 1; }
-
+/* --- Phones (480px and narrower) --- */
 @media (max-width: 480px) {
+
+  /* Dropdown gets its own full-width row under the input */
+  .add-form select {
+    flex: 1 1 100%;
+    width: 100%;
+  }
+
+  /* 16px inputs stop iPhones from zooming in when you tap them */
   .add-form input[type="text"],
   .add-form select,
   .newcat-row input[type="text"] {
@@ -597,38 +1177,64 @@ color: var(--ink-soft); text-decoration: line-through;
   }
 }
 
+
+/* ===========================================================================
+   15. HOVER + TAP FEEDBACK
+   Hover only applies to devices with a real mouse, so phones don't get
+   "stuck" hover states after a tap. :active gives the same feedback on touch.
+   =========================================================================== */
+
 @media (hover: hover) {
+  /* Add form + cuisine editor */
   .enter-btn:hover { opacity: 0.92; }
-  .edit-cats-btn:hover { opacity: 0.92; }
   .newcat-row button:hover { opacity: 0.9; }
-  .item input[type="checkbox"]:hover { border-color: var(--herb); }
-  .del-btn:hover { opacity: 1; color: var(--brick); }
+  .edit-row button:hover { opacity: 0.85; }
   .tab:hover { opacity: 0.85; }
+
+  /* Dish list */
+  .item input[type="checkbox"]:hover { border-color: var(--herb); }
+  .recipe-btn:hover { opacity: 1; color: var(--ink); }
+  .dish-del-btn:hover { color: var(--danger); }
+  .dish-edit-btn:hover { color: var(--ink); }
+
+  /* Shared × button, backup row */
+  .del-btn:hover { opacity: 1; color: var(--brick); }
+  .data-row button:hover { opacity: 1; }
+
+  /* Recipe page */
+  #recipeEdit:hover,
+  .recipe-toolbar button:hover { opacity: 0.85; }
+
+  /* Recently deleted dialog */
+  .trash-restore:hover { background: var(--paper-alt); }
+  .trash-delete:hover { color: var(--danger); background: var(--paper-alt); }
+
+  /* Theme dialog */
+  .theme-opt:hover .theme-swatch { opacity: 0.85; }
 }
 
+/* Add form + cuisine editor */
 .enter-btn:active { opacity: 0.92; }
-.edit-cats-btn:active { opacity: 0.92; }
 .newcat-row button:active { opacity: 0.9; }
-.item input[type="checkbox"]:active { border-color: var(--herb); }
-.del-btn:active { opacity: 1; color: var(--brick); }
+.edit-row button:active { opacity: 0.85; }
 .tab:active { opacity: 0.85; }
 
+/* Dish list */
+.item input[type="checkbox"]:active { border-color: var(--herb); }
+.dish-del-btn:active { color: var(--danger); }
+.dish-edit-btn:active { color: var(--ink); }
 
-/* -----------------------------------------------------------------------
-   DARK MODE (optional — come back to this once everything else works)
-   Redefine your color variables here for when the visitor's system is
-   set to dark mode. Everything else on the page will automatically
-   follow, since it's all built on var(--ink), var(--paper), etc.
-   ----------------------------------------------------------------------- */
-@media (prefers-color-scheme: dark) {
-  :root {
-    --paper: #211A14;
-    --paper-alt: #2A221A;
-    --ink: #F1E7DA;
-    --ink-soft: #A6957F;
-    --card: #26201A;
-    --line: #3D3327;
-    --brick: #E17A52;
-    --herb: #8FB579;
-  }
-}
+/* Shared × button, backup row */
+.del-btn:active { opacity: 1; color: var(--brick); }
+.data-row button:active { opacity: 1; }
+
+/* Recipe page */
+#recipeEdit:active,
+.recipe-toolbar button:active { opacity: 0.85; }
+
+/* Recently deleted dialog */
+.trash-restore:active { background: var(--paper-alt); }
+.trash-delete:active { color: var(--danger); background: var(--paper-alt); }
+
+/* Theme dialog */
+.theme-opt:active .theme-swatch { opacity: 0.85; }

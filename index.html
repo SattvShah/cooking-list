@@ -1,85 +1,180 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-title" content="Cooking List">
-<title>Cooking List</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="Cooking List">
+  <title>Cooking List</title>
 
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <!-- Applies the saved color theme before the page paints, so there's no color flash.
+       Same localStorage key as THEME_KEY in script.js. -->
+  <script>
+    try {
+      var savedTheme = localStorage.getItem('dish-box-theme');
+      if (savedTheme) document.documentElement.setAttribute('data-theme', savedTheme);
+    } catch (e) {}
+  </script>
 
-<link rel="stylesheet" href="style.css">
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+
+  <!-- Whenever you upload changes, bump the ?v= number here AND on the script.js line at the bottom. It makes phones fetch fresh copies. -->
+  <link rel="stylesheet" href="style.css?v=7">
 </head>
 <body>
 
 <div class="wrap">
 
-  <header>
-    <h1 id="listToggle">Cooking List</h1>
-  </header>
+  <!-- ==================================================================
+       LIST SCREEN (the main screen)
+       ================================================================== -->
+  <div id="listView">
 
-  <div class="layout">
+    <header>
+      <h1 id="listToggle">Cooking List</h1>
+    </header>
 
-    <!-- ============ LEFT PANEL ============ -->
-    <div class="panel">
-      <div class="list-content" id="listContent">
-        <div class="add-form">
-          <div class="name-field-wrap">
-            <div class="name-field">
-              <input type="text" id="newDish" placeholder="Add a dish" autocomplete="new-password" spellcheck="false">
-              <button class="enter-btn" id="addBtn" type="button" title="Add dish" aria-label="Add dish">
-                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 10 4 15 9 20"></polyline><path d="M20 4v7a4 4 0 0 1-4 4H4"></path></svg>
-              </button>
+    <div class="layout">
+
+      <!-- ============ LEFT PANEL: add dishes + the dish list ============ -->
+      <div class="panel">
+        <div class="list-content" id="listContent">
+
+          <!-- Add a dish: name box (with enter button inside) + cuisine dropdown -->
+          <div class="add-form">
+            <div class="name-field-wrap">
+              <div class="name-field">
+                <input type="text" id="newDish" placeholder="Add a dish" autocomplete="new-password" spellcheck="false">
+                <button class="enter-btn" id="addBtn" type="button" title="Add dish" aria-label="Add dish">
+                  <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 10 4 15 9 20"></polyline><path d="M20 4v7a4 4 0 0 1-4 4H4"></path></svg>
+                </button>
+              </div>
+              <p id="dishError" class="form-error"></p>
             </div>
-            <p id="dishError" class="form-error"></p>
+            <select id="newCat"></select>
           </div>
-          <select id="newCat"></select>
-          <button class="edit-cats-btn" id="editCatsBtn" type="button">Edit cuisines</button>
-        </div>
 
-        <!-- JS toggles a "show" class on this to reveal/hide it -->
-        <div class="edit-cats-panel" id="editCatsPanel">
-          <div class="newcat-row show">
-            <input type="text" id="newCatInput" placeholder="Add a Cuisine" autocomplete="new-password" spellcheck="false">
-            <button id="saveNewCat" type="button">Add</button>
+          <div class="edit-row">
+            <button id="editCatsBtn" type="button">Edit cuisines</button>
+            <button id="editDishesBtn" type="button">Edit dishes</button>
           </div>
-          <p id="catError" class="form-error"></p>
-          <!-- JS fills this with the list of cuisines + delete buttons -->
-          <div id="catManageList"></div>
+
+          <!-- JS toggles a "show" class on this to reveal/hide it -->
+          <div class="edit-cats-panel" id="editCatsPanel">
+            <div class="newcat-row show">
+              <input type="text" id="newCatInput" placeholder="Add a Cuisine" autocomplete="new-password" spellcheck="false">
+              <button id="saveNewCat" type="button">Add</button>
+            </div>
+            <p id="catError" class="form-error"></p>
+            <!-- JS fills this with the list of cuisines + delete buttons -->
+            <div id="catManageList"></div>
+          </div>
+
+          <!-- JS fills this with the All / Mexican / Italian... tab buttons -->
+          <div class="tabs" id="tabs"></div>
+
+          <!-- JS fills this with the actual recipe checklist, grouped by cuisine -->
+          <div id="groups"></div>
+
         </div>
-
-        <!-- JS fills this with the All / Mexican / Italian... tab buttons -->
-        <div class="tabs" id="tabs"></div>
-
-        <!-- JS fills this with the actual recipe checklist, grouped by cuisine -->
-        <div id="groups"></div>
       </div>
+
+      <!-- ============ RIGHT PANEL: weekly sidebar ============ -->
+      <div class="panel week-panel">
+        <h2>Cooking this week</h2>
+        <p class="week-count" id="weekCount">Nothing checked yet</p>
+        <!-- JS fills this with whichever dishes are currently checked -->
+        <div id="weekList"></div>
+
+        <hr class="panel-divider">
+
+        <h2>Recently cooked</h2>
+        <p class="week-count" id="recentCount">Nothing here yet</p>
+        <!-- JS fills this with dishes recently taken out of "this week" -->
+        <div id="recentList"></div>
+      </div>
+
     </div>
 
-    <!-- ============ RIGHT PANEL ============ -->
-    <div class="panel week-panel">
-      <h2>Cooking this week</h2>
-      <p class="week-count" id="weekCount">Nothing checked yet</p>
-      <!-- JS fills this with whichever dishes are currently checked -->
-      <div id="weekList"></div>
-
-      <hr class="panel-divider">
-
-      <h2>Recently cooked</h2>
-      <p class="week-count" id="recentCount">Nothing here yet</p>
-      <!-- JS fills this with dishes recently taken out of "this week" -->
-      <div id="recentList"></div>
+    <!-- Bottom row: Recently deleted + Change theme on the left, Back up + Restore on the right -->
+    <div class="data-row">
+      <button id="trashBtn" type="button">Recently deleted</button>
+      <button id="themeBtn" type="button">Change theme</button>
+      <button id="exportBtn" type="button">Back up</button>
+      <button id="importBtn" type="button">Restore</button>
     </div>
 
-  </div>
-  <div class="data-row">
-    <button id="importBtn" type="button">Restore</button>
-    <button id="exportBtn" type="button">Back up</button>
-  </div>
+  </div><!-- /listView -->
 
+
+  <!-- ==================================================================
+       RECIPE PAGE (full screen, swaps with the list)
+       ================================================================== -->
+  <section id="recipeView" hidden>
+    <div class="recipe-bar">
+      <button id="recipeBack" type="button" aria-label="Back to list">
+        <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+      </button>
+      <button id="recipeEdit" type="button">Edit</button>
+    </div>
+
+    <!-- Formatting buttons, only visible while editing -->
+    <div class="recipe-toolbar" id="recipeToolbar">
+      <button type="button" data-fmt="bullet" aria-label="Bulleted list">&bull;</button>
+      <button type="button" data-fmt="number" aria-label="Numbered list">1.</button>
+      <button type="button" data-fmt="bold" aria-label="Bold"><b>B</b></button>
+      <button type="button" data-fmt="heading" aria-label="Heading">H</button>
+    </div>
+
+    <div class="recipe-sheet">
+      <h1 id="recipeTitle"></h1>
+      <span class="recipe-tag" id="recipeTag"></span>
+      <div id="recipeEditor" contenteditable="false"></div>
+    </div>
+  </section>
+
+
+  <!-- ==================================================================
+       DIALOGS + TOAST
+       ================================================================== -->
+
+  <!-- Recently deleted -->
+  <dialog id="trashDialog">
+    <p>Recently deleted. Items are removed for good after 30 days.</p>
+    <div id="trashList"></div>
+    <div class="dialog-btns">
+      <button id="trashClose" type="button">Close</button>
+    </div>
+  </dialog>
+
+  <!-- Edit a dish (rename it and/or move it to another cuisine) -->
+  <dialog id="editDishDialog">
+    <p class="dialog-title">Edit dish</p>
+    <label class="dialog-label" for="editDishName">Name</label>
+    <input type="text" id="editDishName" autocomplete="new-password" spellcheck="false">
+    <label class="dialog-label" for="editDishCat">Cuisine</label>
+    <select id="editDishCat"></select>
+    <p id="editDishError" class="form-error"></p>
+    <div class="dialog-btns">
+      <button id="editDishCancel" type="button">Cancel</button>
+      <button id="editDishSave" type="button">Save</button>
+    </div>
+  </dialog>
+
+  <!-- Change theme -->
+  <dialog id="themeDialog">
+    <p>Choose a theme. It's saved on this device.</p>
+    <div class="theme-grid" id="themeList"></div>
+    <div class="dialog-btns">
+      <button id="themeClose" type="button">Close</button>
+    </div>
+  </dialog>
+
+  <!-- Restore from a backup -->
   <dialog id="restoreDialog">
     <p>Paste your backup below. This replaces everything currently in the app.</p>
     <textarea id="restoreText" rows="5"></textarea>
@@ -90,8 +185,14 @@
     </div>
   </dialog>
 
+  <!-- "Deleted ... Undo" message -->
+  <div class="toast" id="toast" role="status" hidden>
+    <span id="toastMsg"></span>
+    <button id="toastUndo" type="button">Undo</button>
+  </div>
+
 </div>
 
-<script src="script.js"></script>
+<script src="script.js?v=7"></script>
 </body>
 </html>
