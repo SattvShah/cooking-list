@@ -48,6 +48,10 @@ const defaultData = {
 const ALLOWED_TAGS = new Set(['strong', 'ul', 'ol', 'li', 'h3', 'p', 'br']);
 const TAG_MAP = { b: 'strong', h1: 'h3', h2: 'h3', h4: 'h3', h5: 'h3', h6: 'h3', div: 'p' };
 
+// Web addresses that become tappable links in the recipe (view mode only):
+// anything starting with http://, https:// or www.
+const URL_PATTERN = /\b(?:https?:\/\/|www\.)[^\s<]+/gi;
+
 // Recipe toolbar: which browser command each button runs (heading is handled separately)
 const FORMAT_CMD = { bullet: 'insertUnorderedList', number: 'insertOrderedList', bold: 'bold' };
 
@@ -760,6 +764,57 @@ function legacyToHtml(text) {
   return html;
 }
 
+// ---- links (view mode only) ----
+// Links are drawn on top of the text when you're viewing a recipe and removed
+// again when you edit. They are never saved: sanitizeHtml() drops <a> tags, so
+// the saved recipe stays plain text.
+
+// Takes sentence punctuation off the end of a web address ("see www.site.com." -> no dot).
+// A closing ) is only removed if it has no matching ( inside the address.
+function trimUrl(url) {
+  while (/[.,;:!?'"]$/.test(url) || (url.endsWith(')') && url.split(')').length > url.split('(').length)) {
+    url = url.slice(0, -1);
+  }
+  return url;
+}
+
+// Turns every web address in the recipe into a link that opens in a new tab / the browser
+function linkifyEditor() {
+  const walker = document.createTreeWalker(recipeEditor, NodeFilter.SHOW_TEXT);
+  const textNodes = [];
+  while (walker.nextNode()) textNodes.push(walker.currentNode);
+
+  for (const node of textNodes) {
+    if (node.parentElement.closest('a')) continue; // already a link
+    const text = node.textContent;
+    const pieces = document.createDocumentFragment();
+    let last = 0;
+
+    for (const m of text.matchAll(URL_PATTERN)) {
+      const url = trimUrl(m[0]);
+      if (/^(?:https?:\/\/|www\.)$/i.test(url)) continue; // just "https://" with nothing after it
+      if (m.index > last) pieces.appendChild(document.createTextNode(text.slice(last, m.index)));
+      const a = document.createElement('a');
+      a.href = /^www\./i.test(url) ? 'https://' + url : url;
+      a.textContent = url;
+      a.target = '_blank';
+      a.rel = 'noopener noreferrer';
+      pieces.appendChild(a);
+      last = m.index + url.length;
+    }
+
+    if (last === 0) continue; // no links in this piece of text
+    if (last < text.length) pieces.appendChild(document.createTextNode(text.slice(last)));
+    node.replaceWith(pieces);
+  }
+}
+
+// Turns the links back into plain text so the recipe can be edited normally
+function unlinkifyEditor() {
+  recipeEditor.querySelectorAll('a').forEach(a => a.replaceWith(document.createTextNode(a.textContent)));
+  recipeEditor.normalize(); // joins the text pieces back together
+}
+
 // ---- open / close / save ----
 
 // Shows the placeholder when the editor has no text
@@ -791,6 +846,7 @@ function setEditing(on) {
   recipeEditor.contentEditable = on ? 'true' : 'false';
   recipeEditor.dataset.placeholder = on ? 'Ingredients, steps, notes...' : 'No recipe yet.';
   if (on) {
+    unlinkifyEditor();
     recipeEditor.focus();
     const range = document.createRange();
     range.selectNodeContents(recipeEditor);
@@ -801,6 +857,7 @@ function setEditing(on) {
   } else {
     recipeEditor.blur();
     saveRecipe();
+    linkifyEditor();
   }
 }
 
@@ -855,32 +912,7 @@ function closeRecipe() {
   window.scrollTo(0, listScroll);
 }
 
-// ---- toolbar + caret helpers (phones) ----
-
-// If the caret is about to sit under the fixed bottom toolbar (phones), scroll it up above the toolbar
-function keepCaretVisible() {
-  if (getComputedStyle(recipeToolbar).position !== 'fixed') return;
-  const sel = getSelection();
-  if (!sel.rangeCount || !recipeEditor.contains(sel.anchorNode)) return;
-  const range = sel.getRangeAt(0).cloneRange();
-  range.collapse(false);
-  let rect = range.getClientRects()[0];
-  if (!rect || (rect.top === 0 && rect.bottom === 0)) {
-    let n = range.startContainer;
-    if (n.nodeType === 1 && n.childNodes.length) n = n.childNodes[Math.min(range.startOffset, n.childNodes.length - 1)];
-    if (n.nodeType === 3) n = n.parentElement;
-    rect = n.getBoundingClientRect();
-  }
-  const limit = recipeToolbar.getBoundingClientRect().top - 12;
-  if (rect.bottom > limit) window.scrollBy(0, rect.bottom - limit);
-}
-
-// Keeps the toolbar pinned just above the on-screen keyboard (CSS reads --kb)
-function placeToolbar() {
-  const vv = window.visualViewport;
-  const kb = Math.max(0, window.innerHeight - vv.height - vv.offsetTop);
-  recipeToolbar.style.setProperty('--kb', kb + 'px');
-}
+// ---- toolbar helpers ----
 
 // Is the caret currently inside a heading?
 const isHeading = () => /h3|heading 3/i.test(document.queryCommandValue('formatBlock'));
@@ -1108,7 +1140,6 @@ document.addEventListener('visibilitychange', () => {
 recipeEditor.addEventListener('input', () => {
   updateEmpty();
   scheduleSave();
-  keepCaretVisible();
 });
 
 // paste as plain text so nothing weird comes in from websites
@@ -1156,23 +1187,12 @@ recipeToolbar.addEventListener('click', (e) => {
   refreshToolbar(); // no selection change fires when bold is just switched on, so update the buttons now
 });
 
-// remembers the caret, lights up the toolbar buttons that apply, and keeps the caret above the toolbar
+// remembers the caret and lights up the toolbar buttons that apply
 document.addEventListener('selectionchange', () => {
   if (!recipeView.classList.contains('editing') || !recipeEditor.contains(getSelection().anchorNode)) return;
   savedRange = getSelection().getRangeAt(0).cloneRange();
   refreshToolbar();
-  keepCaretVisible();
 });
-
-// phones: when the keyboard opens/closes, re-check the caret (after the toolbar
-// has moved) and keep the toolbar pinned just above the keyboard
-if (window.visualViewport) {
-  window.visualViewport.addEventListener('resize', () => {
-    if (recipeView.classList.contains('editing')) setTimeout(keepCaretVisible, 60);
-  });
-  window.visualViewport.addEventListener('resize', placeToolbar);
-  window.visualViewport.addEventListener('scroll', placeToolbar);
-}
 
 
 /* ===========================================================================

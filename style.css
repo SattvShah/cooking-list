@@ -961,8 +961,8 @@ header {
 }
 
 /* --- Formatting toolbar (bullets, numbers, bold, heading) ---
-   Only visible in edit mode. Sits under the top bar on desktop; on phones
-   it moves to the bottom above the keyboard (see section 14). */
+   Only visible in edit mode. Sticks just under the top bar, so it stays in
+   view while you scroll (same on phones and desktop). */
 .recipe-toolbar {
   display: none;
   position: sticky;
@@ -1024,6 +1024,7 @@ header {
   line-height: 1.6;
   white-space: pre-wrap; /* keeps tab characters */
   tab-size: 4;
+  overflow-wrap: anywhere; /* long web addresses wrap instead of running off the screen */
 }
 
 #recipeView:not(.editing) #recipeEditor { min-height: 1.6em; }
@@ -1038,6 +1039,13 @@ header {
 
 /* Formatting that can appear inside a recipe */
 #recipeEditor p { margin: 0; }
+
+/* Web addresses show as tappable links in view mode (script.js adds/removes them) */
+#recipeEditor a {
+  color: var(--brick);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
 
 #recipeEditor h3 {
   font-family: 'Fraunces', serif;
@@ -1143,21 +1151,6 @@ header {
     padding: 0;
     min-height: 0;
   }
-
-  /* Recipe toolbar sits above the keyboard (--kb is set by script.js) */
-  .recipe-toolbar {
-    position: fixed;
-    top: auto;
-    left: 0;
-    right: 0;
-    bottom: var(--kb, 0px);
-    padding: 0.5rem 0.75rem;
-    border-top: 1px solid var(--line);
-    background: var(--card);
-  }
-
-  /* Extra space at the bottom so the toolbar doesn't cover the text */
-  #recipeView.editing { padding-bottom: 4rem; }
 }
 
 /* --- Phones (480px and narrower) --- */
