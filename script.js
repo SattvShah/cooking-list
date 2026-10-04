@@ -201,8 +201,12 @@ function escapeHtml(s) {
 }
 
 // Turns a timestamp into "today" / "yesterday" / a date like 9/21/2026.
+// Compares calendar days (not 24-hour chunks), so anything from before
+// midnight says "yesterday" no matter what time it is now.
 function daysAgoText(timestamp) {
-  const days = Math.floor((Date.now() - timestamp) / 86400000);
+  const startOfDay = t => { const d = new Date(t); d.setHours(0, 0, 0, 0); return d; };
+  // round (not floor) so days with a daylight-saving clock change (23 or 25 hours) still count as 1 day
+  const days = Math.round((startOfDay(Date.now()) - startOfDay(timestamp)) / 86400000);
   if (days <= 0) return 'today';
   if (days === 1) return 'yesterday';
   return new Date(timestamp).toLocaleDateString();
