@@ -569,11 +569,13 @@ function renderGroups() {
   const container = document.getElementById('groups');
   let allHTML = '';
 
-  // which cuisines to show, based on the selected tab
+  // which cuisines to show, based on the selected tab in alphabetical order
   const catsToShow = activeFilter === 'All' ? data.categories : [activeFilter];
 
   for (const cat of catsToShow) {
-    const dishesInCat = data.dishes.filter(r => r.cat === cat);
+    const dishesInCat = data.dishes
+      .filter(r => r.cat === cat)
+      .sort((a, b) => a.name.localeCompare(b.name, undefined, { sensitivity: 'base' }));
     allHTML += `<h2>${cat}</h2>`;
     if (dishesInCat.length === 0) {
       allHTML += `<p class="empty">no dishes yet</p>`;
@@ -652,12 +654,12 @@ function renderWeekList() {
   });
 }
 
-// Sidebar: "Recently cooked" (every dish with a cookedAt time, newest first)
+// Sidebar: "Recently cooked" (every dish with a cookedAt time, oldest first)
 function renderRecentList() {
   const list = document.getElementById('recentList');
   const count = document.getElementById('recentCount');
 
-  const recentList = data.dishes.filter(r => r.cookedAt !== null).sort((a, b) => b.cookedAt - a.cookedAt);
+  const recentList = data.dishes.filter(r => r.cookedAt !== null).sort((a, b) => a.cookedAt - b.cookedAt);
 
   count.innerHTML = recentList.length === 0 ? 'Nothing here yet' :
     `${dishCount(recentList.length)} cooked recently`;
