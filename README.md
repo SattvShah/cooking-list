@@ -4,6 +4,8 @@ A simple, private cooking list that runs entirely in your browser. Keep track of
 
 No accounts, no server, no build step. Just three static files and your browser's `localStorage`.
 
+**[Live demo](https://sattvshah.github.io/cooking-list/)**
+
 ## Features
 
 - **Dish list grouped by cuisine.** Add dishes, assign them to a cuisine, and filter with tabs.
@@ -17,19 +19,9 @@ No accounts, no server, no build step. Just three static files and your browser'
 
 ## Getting started
 
-There is nothing to install.
+There is nothing to install. To run it locally, clone or download this repository and open `index.html` in your browser.
 
-1. Clone or download this repository.
-2. Open `index.html` in your browser.
-
-To use it on your phone, host the folder anywhere that serves static files (GitHub Pages, Netlify, Cloudflare Pages, and so on), open the URL, and use **Add to Home Screen**.
-
-### Deploying with GitHub Pages
-
-1. Push the project to a GitHub repository.
-2. Go to **Settings → Pages**.
-3. Under **Build and deployment**, choose **Deploy from a branch**, select `main` and `/ (root)`, and save.
-4. Your app will be live at `https://<your-username>.github.io/<repo-name>/`.
+On your phone, open the live demo link above and use **Add to Home Screen** to get an app-style icon.
 
 ## Your data
 
